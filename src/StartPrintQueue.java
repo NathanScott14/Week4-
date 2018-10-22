@@ -9,7 +9,7 @@ public class StartPrintQueue{
         JavaSpace space = SpaceUtils.getSpace();
 
         if (space == null){
-            System.err.println("Failed to find the javaspace - NATHAN EDIT");
+            System.err.println("Failed to find the javaspace");
             System.exit(1);
         }
 
