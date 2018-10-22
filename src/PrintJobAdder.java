@@ -13,7 +13,7 @@ public class PrintJobAdder extends JFrame {
 	public PrintJobAdder() {
 		space = SpaceUtils.getSpace();
 		if (space == null){
-			System.err.println("Failed to find the javaspace - PC EDIT - Nathan");
+			System.err.println("Failed to find the javaspace - VM TEST EDIT");
 			System.exit(1);
 		}
 
