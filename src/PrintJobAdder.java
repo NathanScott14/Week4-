@@ -8,6 +8,7 @@ public class PrintJobAdder extends JFrame {
 	private JavaSpace space;
 
 	private JTextField jobNameIn, jobNumberOut;
+	private JTextField printerNameln;
 
 
 	public PrintJobAdder() {
@@ -56,6 +57,18 @@ public class PrintJobAdder extends JFrame {
 		JPanel jPanel2 = new JPanel();
 		jPanel2.setLayout (new FlowLayout ());
 
+		JPanel jPanel3 = new JPanel();
+		jPanel3.setLayout( new FlowLayout());
+
+		JLabel printerNameLabel = new JLabel();
+		printerNameLabel.setText("Name of Printer ");
+		jPanel3.add(printerNameLabel);
+
+		printerNameln = new JTextField(12);
+		printerNameln.setText("");
+		jPanel3.add(printerNameln);
+
+
 		JButton addJobButton = new JButton();
 		addJobButton.setText("Add Print Job");
 		addJobButton.addActionListener (new java.awt.event.ActionListener () {
@@ -68,24 +81,32 @@ public class PrintJobAdder extends JFrame {
 
         cp.add (jPanel1, "North");
         cp.add (jPanel2, "South");
+        cp.add(jPanel3, "Center");
 	}
 
 
-	private void addJob(java.awt.event.ActionEvent evt){
-		try {
+	private void addJob(java.awt.event.ActionEvent evt)
+	{
+		try
+		{
 			QueueStatus qsTemplate = new QueueStatus();
 			QueueStatus qStatus = (QueueStatus)space.take(qsTemplate,null,Long.MAX_VALUE);
 
 			int jobNumber = qStatus.nextJob;
 			String jobName = jobNameIn.getText();
-			QueueItem newJob = new QueueItem(jobNumber, jobName);
-			space.write( newJob, null, Lease.FOREVER);
+			String printerName = printerNameln.getText();
+
+			NamedPrinterQuqueItem newJob = new NamedPrinterQuqueItem(jobNumber, jobName, printerName);
+			//QueueItem newJob = new QueueItem(jobNumber, jobName); //Part of old system.
+			space.write(newJob, null, Lease.FOREVER);
 			jobNumberOut.setText(""+jobNumber);
 
 			qStatus.addJob();
 
 			space.write( qStatus, null, Lease.FOREVER);
-		}  catch ( Exception e) {
+		}
+		catch ( Exception e)
+		{
 			e.printStackTrace();
 		}
 	}

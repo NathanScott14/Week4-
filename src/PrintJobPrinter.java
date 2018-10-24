@@ -9,6 +9,7 @@ public class PrintJobPrinter extends JFrame {
 
     private JavaSpace space;
     private JTextArea jobList;
+    private String printerName;
 
     public PrintJobPrinter() {
         space = SpaceUtils.getSpace();
@@ -24,7 +25,10 @@ public class PrintJobPrinter extends JFrame {
     }
 
     private void initComponents () {
-        setTitle ("Print Job Printer");
+
+        printerName = JOptionPane.showInputDialog("Enter Name of Printer"); // Added to prompt the user to enter printer name.
+
+        setTitle ("Printer Name: " + printerName);
         addWindowListener (new java.awt.event.WindowAdapter () {
             public void windowClosing (java.awt.event.WindowEvent evt) {
                 System.exit(0);
@@ -46,8 +50,12 @@ public class PrintJobPrinter extends JFrame {
     public void processPrintJobs(){
         while(true){
             try {
-                QueueItem qiTemplate = new QueueItem();
-                QueueItem nextJob = (QueueItem)space.take(qiTemplate,null, TWO_SECONDS);
+                //QueueItem qiTemplate = new QueueItem();
+                //QueueItem nextJob = (QueueItem)space.take(qiTemplate,null, TWO_SECONDS);
+
+                NamedPrinterQuqueItem qiTemplate = new NamedPrinterQuqueItem();
+                qiTemplate.printerName = printerName;
+                NamedPrinterQuqueItem nextJob = (NamedPrinterQuqueItem)space.take(qiTemplate, null, TWO_SECONDS);
                 if (nextJob == null) {
                     // no print job was found, so sleep for a couple of seconds and try again
                     Thread.sleep(TWO_SECONDS);
