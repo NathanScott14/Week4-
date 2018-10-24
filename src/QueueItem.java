@@ -1,5 +1,6 @@
 import net.jini.core.entry.*;
 
+// Old class used in older version.
 public class QueueItem implements Entry{
     // Variables
     public Integer jobNumber;

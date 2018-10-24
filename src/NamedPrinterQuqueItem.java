@@ -2,7 +2,7 @@ import net.jini.core.entry.*;
 
 public class NamedPrinterQuqueItem implements Entry
 {
-    // Variables.
+    // Variables
     public Integer jobNumber;
     public String filename;
     public String printerName;

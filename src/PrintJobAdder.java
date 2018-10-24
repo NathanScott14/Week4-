@@ -84,7 +84,6 @@ public class PrintJobAdder extends JFrame {
         cp.add(jPanel3, "Center");
 	}
 
-
 	private void addJob(java.awt.event.ActionEvent evt)
 	{
 		try
