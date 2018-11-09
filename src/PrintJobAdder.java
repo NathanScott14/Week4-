@@ -5,6 +5,8 @@ import net.jini.core.lease.*;
 import java.awt.*;
 import javax.swing.*;
 
+// Test
+
 public class PrintJobAdder extends JFrame {
 
 	private JavaSpace space;
