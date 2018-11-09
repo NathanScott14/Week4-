@@ -1,3 +1,5 @@
+import net.jini.core.transaction.*;
+import net.jini.core.transaction.server.*;
 import net.jini.space.*;
 import net.jini.core.lease.*;
 import java.awt.*;
@@ -6,6 +8,7 @@ import javax.swing.*;
 public class PrintJobAdder extends JFrame {
 
 	private JavaSpace space;
+	private TransactionManager mgr;
 
 	private JTextField jobNameIn, jobNumberOut;
 	private JTextField printerNameln;
@@ -17,6 +20,12 @@ public class PrintJobAdder extends JFrame {
 			System.err.println("Failed to find the javaspace - VM TEST EDIT");
 			System.exit(1);
 		}
+		
+		mgr = SpaceUtils.getManager();
+		if(mgr == null) {
+		    System.err.println("Failed to find the transaction manager");
+		    System.exit(1);
+        }
 
 		initComponents ();
 		pack ();
@@ -86,30 +95,57 @@ public class PrintJobAdder extends JFrame {
 
 	private void addJob(java.awt.event.ActionEvent evt)
 	{
+        Transaction.Created trc = null;
+        
+        try
+        {
+            trc = TransactionFactory.create(mgr, 3000);
+        }
+        catch (Exception e)
+        {
+            System.out.println("Could not create transaction " + e);;
+        }
+        
+        Transaction txn = trc.transaction;
+        
 		try
 		{
-			QueueStatus qsTemplate = new QueueStatus();
-			QueueStatus qStatus = (QueueStatus)space.take(qsTemplate,null,Long.MAX_VALUE);
-
-			int jobNumber = qStatus.nextJob;
-			String jobName = jobNameIn.getText();
-			String printerName = printerNameln.getText();
-
-			NamedPrinterQuqueItem newJob = new NamedPrinterQuqueItem(jobNumber, jobName, printerName);
-			//QueueItem newJob = new QueueItem(jobNumber, jobName); //Part of old system.
-			space.write(newJob, null, Lease.FOREVER);
-			jobNumberOut.setText(""+jobNumber);
-
-			qStatus.addJob();
-
-			space.write( qStatus, null, Lease.FOREVER);
+            QueueStatus qsTemplate = new QueueStatus();
+            
+            try
+            {
+                QueueStatus qStatus = (QueueStatus) space.read(qsTemplate, txn, Long.MAX_VALUE);
+    
+                int jobNumber = qStatus.nextJob;
+                String jobName = jobNameIn.getText();
+                String printerName = printerNameln.getText();
+    
+                NamedPrinterQuqueItem newJob = new NamedPrinterQuqueItem(jobNumber, jobName, printerName);
+                //QueueItem newJob = new QueueItem(jobNumber, jobName); //Part of old system.
+                space.write(newJob, txn, Lease.FOREVER);
+                jobNumberOut.setText("" + jobNumber);
+    
+                qStatus.addJob();
+    
+                space.write(qStatus, txn, Lease.FOREVER);
+            }
+            catch ( Exception e)
+            {
+                System.out.println("Failed to read or write to space " + e);
+                txn.abort();
+    
+                System.exit(1);
+            }
+            
+            txn.commit();
 		}
 		catch ( Exception e)
 		{
+            System.out.print("Transaction failed " + e);
 			e.printStackTrace();
 		}
-	}
-
+    }
+	
 	public static void main(String[] args) {
 		new PrintJobAdder().setVisible(true);
 	}
